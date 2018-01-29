@@ -36,25 +36,28 @@ var Table = React.createClass({
     },
     renderRow:function(item){
         var rowStyle = {
-            background : "linear-gradient(to right, whitesmoke " + Math.round(item.percent) + "%, #ffffff " + Math.round(item.percent) + "%)",
+            backgroundImage : "linear-gradient(to right, whitesmoke " + Math.round(item.percent) + "%, #ffffff " + Math.round(item.percent) + "%)",
         };
 
         return <tr key={item.name} style={rowStyle}>
-            <td>{this.renderFlag(item)}{item.name}</td>
-            <td>{Math.round(item.average)}ms</td>
-            <td><Sparklines data={item.values || []} width={100} height={8} limit={100} ><SparklinesLine /></Sparklines></td>
-        </tr>
+                <td>{this.renderFlag(item)}{item.name}</td>
+                <td>{Math.round(item.average)}ms</td>
+                <td><Sparklines data={item.values || []} width={100} height={8} limit={100} ><SparklinesLine /></Sparklines></td>
+            </tr>
+      
     },
     render:function(){
         return <div>
             <table className="table results-table">
-                <tbody>
+                <thead>
                     <tr>
                         <th width="33%">Data Center</th>
                         <th width="33%">Average Latency</th>
                         <th width="34%">History</th>
                     </tr>
-                    {this.props.history.map(this.renderRow)}
+                </thead>
+                <tbody>
+                {this.props.history.map(this.renderRow)}
                 </tbody>
             </table>
             <p>Share your results with other people on twitter {this.renderButton()}</p>
