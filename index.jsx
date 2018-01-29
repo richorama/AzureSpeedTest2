@@ -35,7 +35,11 @@ var Table = React.createClass({
         return <img src={item.icon} className="icon" />
     },
     renderRow:function(item){
-        return <tr>
+        var rowStyle = {
+            background : "linear-gradient(to right, whitesmoke " + Math.round(item.percent) + "%, #ffffff " + Math.round(item.percent) + "%)",
+        };
+
+        return <tr key={item.name} style={rowStyle}>
             <td>{this.renderFlag(item)}{item.name}</td>
             <td>{Math.round(item.average)}ms</td>
             <td><Sparklines data={item.values || []} width={100} height={8} limit={100} ><SparklinesLine /></Sparklines></td>
