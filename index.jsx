@@ -55,7 +55,7 @@ var Table = React.createClass({
             </table>
             <p>Share your results with other people on twitter {this.renderButton()}</p>
             <p>Compare your speed with others by watching the <a href="https://twitter.com/search?q=%23AzureSpeedTest&src=hash&mode=realtime">#AzureSpeedTest</a> hashtag.</p>
-            <p><a href="https://github.com/richorama/AzureSpeedTest">Fork</a> on GitHub.</p>
+            <p><a href="https://github.com/richorama/AzureSpeedTest2">Fork</a> on GitHub.</p>
             <p>Created by <a href="https://www.twitter.com/richorama/">@richorama</a> at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>. Thanks to <a href="https://twitter.com/mickba">Mick Badran</a> for the storage accounts in Australia. Thanks to <a href="https://github.com/ncareau">NMC</a> for the storage accounts in Canada.</p>
             <p><small>The latency times are indicative only, and do not represent the maxium performance achievable from Microsoft Azure. Use this website purely as a tool to gauge which Azure Data Center could be the best for your location.</small></p>
         </div>
