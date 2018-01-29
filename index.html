@@ -4,20 +4,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="Azure Speed Test 2.0 - Measure the latenecy to your nearest Microsoft Azure Data Center">
         <meta name="author" content="Richard Astbury">
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-        <title>Azure Speed Test</title>
+        <title>Azure Speed Test 2.0</title>
         <link rel="icon" type="image/png" href="/favicon.png" />
         <style>
             .container {
                 width:970px;
             }
+
+            .icon {
+                width:25px;
+                margin-right:8px;
+            }
+
+            .results-table {
+                margin-bottom:75px;
+            }
         </style>
     </head>
     <body>
+        <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">Azure Speed Test 2.0</h1>
+            <p class="lead">We are measuring the latency from your web browser to the Blob Storage Service in each of the Microsoft Azure Data Centers.</p>
+        </div>
+    </div>
         <div class="container">
             <div id="content">
-
+                Starting...
             </div>
         </div>
 
