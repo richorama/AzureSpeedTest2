@@ -51,13 +51,13 @@ var Table = React.createClass({
             <table className="table results-table">
                 <thead>
                     <tr>
-                        <th width="33%">Data Center</th>
-                        <th width="33%">Average Latency</th>
-                        <th width="34%">History</th>
+                        <th>Data Center</th>
+                        <th>Average Latency</th>
+                        <th>History</th>
                     </tr>
                 </thead>
                 <tbody>
-                {this.props.history.map(this.renderRow)}
+                    {this.props.history.map(this.renderRow)}
                 </tbody>
             </table>
             <p>Share your results with other people on twitter {this.renderButton()}</p>
