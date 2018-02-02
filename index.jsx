@@ -1,6 +1,5 @@
 var React = require('react');
 var ReactDom = require('react-dom');
-
 var speedtest = require('./lib/speed-test');
 var history = require('./lib/history');
 var sl = require('react-sparklines');
@@ -36,7 +35,7 @@ var Table = React.createClass({
     },
     renderRow:function(item){
         var rowStyle = {
-            backgroundImage : "linear-gradient(to right, whitesmoke " + Math.round(item.percent) + "%, #ffffff " + Math.round(item.percent) + "%)",
+            backgroundImage : "linear-gradient(to right, #e9ecef " + Math.round(item.percent) + "%, #ffffff " + Math.round(item.percent) + "%)",
         };
 
         return <tr key={item.name} style={rowStyle}>
