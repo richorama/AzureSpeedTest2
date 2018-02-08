@@ -1,5 +1,5 @@
 build:
-	@rm index.min.js
+	-@rm index.min.js
 	@echo Lint
 	@eslint . --ext .js --ext .jsx
 	@echo Build
