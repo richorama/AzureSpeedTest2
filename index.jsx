@@ -110,9 +110,8 @@ var Table = class extends React.Component {
         </p>
         <p>
           Created by <a href="https://www.twitter.com/richorama/">@richorama</a>{' '}
-          at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>.
-          Thanks to <a href="https://twitter.com/mickba">Mick Badran</a> for the
-          storage accounts in Australia. Thanks to{' '}
+          at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>.{' '}
+          Thanks to{' '}
           <a href="https://github.com/ncareau">NMC</a> for the storage accounts
           in Canada.
         </p>
