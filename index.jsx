@@ -125,6 +125,9 @@ var Table = class extends React.Component {
           .
         </p>
         <p>
+          Can't see a data center you were expecting? See <a href="https://github.com/richorama/AzureSpeedTest2/issues/12">this issue</a> for more information.
+        </p>
+        <p>
           To compare AWS regions, please see the{' '}
           <a href="http://awsspeedtest.xvf.dk/">AWS Speed Test</a>.
         </p>
