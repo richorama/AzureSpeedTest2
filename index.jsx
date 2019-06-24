@@ -1,29 +1,35 @@
-var React = require('react')
-var ReactDom = require('react-dom')
-var speedtest = require('./lib/speed-test')
-var history = require('./lib/history')
-var sl = require('react-sparklines')
-var Sparklines = sl.Sparklines
-var SparklinesLine = sl.SparklinesCurve
+const React = require('react')
+const ReactDom = require('react-dom')
+const speedtest = require('./lib/speed-test')
+const history = require('./lib/history')
+const sl = require('react-sparklines')
+const Sparklines = sl.Sparklines
+const SparklinesLine = sl.SparklinesCurve
 
 // record history
 speedtest.on(history.record)
 
-speedtest.on(() => render(<Table history={history.read()} />))
+speedtest.on(() =>
+  render(<Table history={history.read()} blockList={globalBlockList} />)
+)
+
+let globalBlockList = []
+speedtest.onBlocklistUpdate(blockList => (globalBlockList = blockList))
 
 function render(jsx) {
   ReactDom.render(jsx, document.getElementById('content'))
 }
 
-var Table = class extends React.Component {
-  constructor(props){
+const Table = class extends React.Component {
+  constructor(props) {
     super(props)
     this.renderButton = this.renderButton.bind(this)
     this.renderFlag = this.renderFlag.bind(this)
     this.renderRow = this.renderRow.bind(this)
+    this.renderError = this.renderError.bind(this)
   }
   renderButton() {
-    var item = this.props.history[0]
+    let item = this.props.history[0]
 
     if (!item) return ''
     if (item.cdn || false) item = this.props.history[1]
@@ -52,7 +58,7 @@ var Table = class extends React.Component {
     return <img src={item.icon} className="icon" />
   }
   renderRow(item) {
-    var rowStyle = {
+    const rowStyle = {
       backgroundImage:
         'linear-gradient(to right, #e9ecef ' +
         Math.round(item.percent) +
@@ -68,19 +74,38 @@ var Table = class extends React.Component {
           {item.name}
         </td>
         <td>{Math.round(item.average)}ms</td>
-        <td>
+        <td style={{ padding: 0 }}>
           <Sparklines
             data={item.values || []}
-            width={100}
-            height={8}
+            width={200}
+            height={48}
             limit={100}
           >
-            <SparklinesLine />
+            <SparklinesLine
+              color="#B8BABC"
+              vector-effect="non-scaling-stroke"
+            />
           </Sparklines>
         </td>
       </tr>
     )
   }
+
+  renderError(item) {
+    return (
+      <tr key={item.name}>
+        <td>
+          {this.renderFlag(item)}
+          {item.name}
+        </td>
+        <td>
+          <span className="badge badge-danger">NO RESPONSE</span>
+        </td>
+        <td />
+      </tr>
+    )
+  }
+
   render() {
     return (
       <div>
@@ -93,6 +118,7 @@ var Table = class extends React.Component {
             </tr>
           </thead>
           <tbody>{this.props.history.map(this.renderRow)}</tbody>
+          <tbody>{this.props.blockList.map(this.renderError)}</tbody>
         </table>
         <p>
           Share your results with other people on twitter {this.renderButton()}
@@ -111,9 +137,8 @@ var Table = class extends React.Component {
         <p>
           Created by <a href="https://www.twitter.com/richorama/">@richorama</a>{' '}
           at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>.{' '}
-          Thanks to{' '}
-          <a href="https://github.com/ncareau">NMC</a> for the storage accounts
-          in Canada.
+          Thanks to <a href="https://github.com/ncareau">NMC</a> for the storage
+          accounts in Canada.
         </p>
         <p>
           The{' '}
@@ -125,7 +150,11 @@ var Table = class extends React.Component {
           .
         </p>
         <p>
-          Can't see a data center you were expecting? See <a href="https://github.com/richorama/AzureSpeedTest2/issues/12">this issue</a> for more information.
+          Can't see a data center you were expecting? See{' '}
+          <a href="https://github.com/richorama/AzureSpeedTest2/issues/12">
+            this issue
+          </a>{' '}
+          for more information.
         </p>
         <p>
           To compare AWS regions, please see the{' '}

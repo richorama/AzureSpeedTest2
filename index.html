@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Azure Speed Test 2.0 - Measure the latenecy to your nearest Microsoft Azure Data Center">
-        <meta name="author" content="Richard Astbury">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-        <title>Azure Speed Test 2.0</title>
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <style>
-            .container {
-                width:970px;
-            }
 
-            .icon {
-                width:25px;
-                margin-right:8px;
-            }
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Azure Speed Test 2.0 - Measure the latenecy to your nearest Microsoft Azure Data Center">
+    <meta name="author" content="Richard Astbury">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <title>Azure Speed Test 2.0</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+        .container {
+            width: 970px;
+        }
 
-            .results-table {
-                margin-bottom:75px;
-            }
-           
-            tr {
-                display:flex;
-                width:100%;
-            }
+        .icon {
+            width: 25px;
+            margin-right: 8px;
+        }
 
-            td, th {
-                flex:1;
-            }
-            
-            svg{
-                height:24px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="jumbotron">
+        .results-table {
+            margin-bottom: 75px;
+        }
+
+        tr {
+            display: flex;
+            width: 100%;
+        }
+
+        td,
+        th {
+            flex: 1;
+        }
+
+        svg {
+            width: 200px;
+            height: 100%;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="jumbotron">
         <div class="container">
             <h1 class="display-4">Azure Speed Test 2.0</h1>
-            <p class="lead">Measuring the latency from your web browser to the Blob Storage Service in each of the Microsoft Azure Data Centers.</p>
+            <p class="lead">Measuring the latency from your web browser to the Blob Storage Service in each of the
+                Microsoft Azure Data Centers.</p>
         </div>
     </div>
-        <div class="container">
-            <div id="content">
-                Starting...
-            </div>
+    <div class="container">
+        <div id="content">
+            Starting...
         </div>
+    </div>
 
-        <script src="index.min.js"></script>
-    </body>
+    <script src="index.min.js"></script>
+</body>
+
 </html>
