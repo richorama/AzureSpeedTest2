@@ -9,9 +9,11 @@ const SparklinesLine = sl.SparklinesCurve
 // record history
 speedtest.on(history.record)
 
-speedtest.on(() =>
+speedtest.on(() => {
+  const scrollPosition = window.scrollY
   render(<Table history={history.read()} blockList={globalBlockList} />)
-)
+  window.scrollY = scrollPosition
+})
 
 let globalBlockList = []
 speedtest.onBlocklistUpdate(blockList => (globalBlockList = blockList))
