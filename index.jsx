@@ -103,7 +103,9 @@ const Table = class extends React.Component {
         <td>
           <span className="badge badge-danger">NO RESPONSE</span>
         </td>
-        <td />
+        <td>
+          <a href="javascript:void(0);" onClick={speedtest.retry.bind(null, item.domain)}>Retry</a>
+        </td>
       </tr>
     )
   }
