@@ -76,7 +76,7 @@ const Table = class extends React.Component {
           {item.name}
         </td>
         <td>{Math.round(item.average)}ms</td>
-        <td style={{ padding: 0 }}>
+        <td style={{ padding: 0 }} className="no-mobile">
           <Sparklines
             data={item.values || []}
             width={200}
@@ -103,7 +103,7 @@ const Table = class extends React.Component {
         <td>
           <span className="badge badge-danger">NO RESPONSE</span>
         </td>
-        <td>
+        <td className="no-mobile">
           <a href="javascript:void(0);" onClick={speedtest.retry.bind(null, item.domain)}>Retry</a>
         </td>
       </tr>
@@ -118,7 +118,7 @@ const Table = class extends React.Component {
             <tr>
               <th>Data Center</th>
               <th>Average Latency</th>
-              <th>History</th>
+              <th className="no-mobile">History</th>
             </tr>
           </thead>
           <tbody>{this.props.history.map(this.renderRow)}</tbody>
