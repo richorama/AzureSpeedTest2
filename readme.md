@@ -18,6 +18,8 @@ $ npm run build
 Not all regions are available to everyone. I have added the regions that are generally available to all,
 and some kind individuals have set up additional regions that they have access to.
 
+The cost should be negligible, and if you change your mind at any time and want to remove the region, that's ok - just let me know.
+
 To add a region, follow this process:
 
 1. Create a storage account, preferably with a name like `speedtestxyz`, where the 'xyz' is an abbreviation of your region name. The storage account can be a standard, locally redundant account (the cheapest kind).
