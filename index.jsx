@@ -141,8 +141,14 @@ const Table = class extends React.Component {
         <p>
           Created by <a href="https://www.twitter.com/richorama/">@richorama</a>{' '}
           at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>.{' '}
-          Thanks to <a href="https://github.com/ncareau">NMC</a> for the storage
-          accounts in Canada. Thanks to <a href="https://github.com/Lukas34">Lukas Langrock</a> for the storage account in Germany.
+        </p>
+        <p>
+          Thanks to:
+          <ul>
+            <li><a href="https://github.com/ncareau">NMC</a> for the storage accounts in Canada.</li>
+            <li><a href="https://github.com/Lukas34">Lukas Langrock</a> for the storage account in Germany.</li>
+            <li><a href="https://github.com/jurajsucik">Juraj Sucik</a> for the storage accounts in Switzerland.</li>
+          </ul>
         </p>
         <p>
           The{' '}
