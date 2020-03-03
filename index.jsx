@@ -57,7 +57,7 @@ const Table = class extends React.Component {
   }
   renderFlag(item) {
     if (!item.icon) return ''
-    return <img src={item.icon} className="icon" />
+    return <img src={item.icon} className="icon" itemType="image/svg" />
   }
   renderRow(item) {
     const rowStyle = {
