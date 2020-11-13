@@ -147,7 +147,7 @@ const Table = class extends React.Component {
           <ul>
             <li><a href="https://github.com/ncareau">NMC</a> for the storage accounts in Canada.</li>
             <li><a href="https://github.com/jurajsucik">Juraj Sucik</a> for the storage accounts in Switzerland and Germany North.</li>
-1          </ul>
+          </ul>
         </p>
         <p>
           The{' '}
