@@ -139,8 +139,7 @@ const Table = class extends React.Component {
           GitHub.
         </p>
         <p>
-          Created by <a href="https://www.twitter.com/richorama/">@richorama</a>{' '}
-          at <a href="https://www.twitter.com/two10degrees/">@two10degrees</a>.{' '}
+          Created by <a href="https://www.twitter.com/richorama/">@richorama</a>
         </p>
         <p>
           Thanks to:
