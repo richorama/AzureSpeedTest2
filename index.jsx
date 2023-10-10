@@ -6,6 +6,8 @@ const sl = require('react-sparklines')
 const Sparklines = sl.Sparklines
 const SparklinesLine = sl.SparklinesCurve
 
+const ICON_LOCATION = "https://cdn.statically.io/gh/hampusborgos/country-flags/main/svg/"
+
 // record history
 speedtest.on(history.record)
 
@@ -57,7 +59,7 @@ const Table = class extends React.Component {
   }
   renderFlag(item) {
     if (!item.icon) return ''
-    return <img src={item.icon} className="icon" itemType="image/svg" />
+    return <img src={ICON_LOCATION + item.icon} className="icon" itemType="image/svg" />
   }
   renderRow(item) {
     const rowStyle = {
