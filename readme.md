@@ -4,6 +4,8 @@
 
 Measures the network latency between your browser and the each of the Azure Data Centers.
 
+[https://richorama.github.io/AzureSpeedTest2/](https://richorama.github.io/AzureSpeedTest2/)
+
 ## Building the UI
 
 You can use these commands to build the User Interface:
