@@ -27,11 +27,36 @@ function render(jsx) {
 const Table = class extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      darkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
     this.renderButton = this.renderButton.bind(this)
     this.renderFlag = this.renderFlag.bind(this)
     this.renderRow = this.renderRow.bind(this)
     this.renderError = this.renderError.bind(this)
+    this.toggleDarkMode = this.toggleDarkMode.bind(this)
   }
+
+  componentDidMount() {
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleSystemDarkModeChange)
+    }
+  }
+
+  componentWillUnmount() {
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemDarkModeChange)
+    }
+  }
+
+  handleSystemDarkModeChange = (e) => {
+    this.setState({ darkMode: e.matches })
+  }
+
+  toggleDarkMode() {
+    this.setState(prevState => ({ darkMode: !prevState.darkMode }))
+  }
+
   renderButton() {
     let item = this.props.history[0]
 
@@ -113,9 +138,15 @@ const Table = class extends React.Component {
   }
 
   render() {
+    const { darkMode } = this.state
+    const tableClassName = darkMode ? 'table results-table dark-mode' : 'table results-table'
+
     return (
       <div>
-        <table className="table results-table">
+        <button onClick={this.toggleDarkMode} className="btn btn-secondary">
+          Toggle Dark Mode
+        </button>
+        <table className={tableClassName}>
           <thead>
             <tr>
               <th>Data Center</th>
