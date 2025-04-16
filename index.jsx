@@ -175,7 +175,7 @@ const Table = class extends React.Component {
         <p>
           <small>
             The latency times are indicative only, and do not represent the
-            maxium performance achievable from Microsoft Azure. Use this website
+            maximum performance achievable from Microsoft Azure. Use this website
             purely as a tool to gauge which Azure Data Center could be the best
             for your location.
           </small>
