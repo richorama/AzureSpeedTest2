@@ -146,6 +146,7 @@ const Table = class extends React.Component {
         <p>
           Thanks to:
           <ul>
+            <li><a href="https://github.com/TimNilimaa">Tim Nilimaa</a> for a number of contributions to regions and code improvements.</li>
             <li><a href="https://github.com/ncareau">NMC</a> for the storage accounts in Canada.</li>
             <li><a href="https://github.com/jurajsucik">Juraj Sucik</a> for the storage accounts in Switzerland and Germany North.</li>
             <li><a href="https://github.com/wi5nia">Tomasz Wisniewski</a> for the storage account in Poland Central</li>
