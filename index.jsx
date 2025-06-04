@@ -174,10 +174,6 @@ const Table = class extends React.Component {
           for more information.
         </p>
         <p>
-          To compare AWS regions, please see the{' '}
-          <a href="http://awsspeedtest.xvf.dk/">AWS Speed Test</a>.
-        </p>
-        <p>
           <small>
             The latency times are indicative only, and do not represent the
             maximum performance achievable from Microsoft Azure. Use this website
