@@ -1,5 +1,5 @@
 const React = require('react')
-const ReactDom = require('react-dom')
+const { createRoot } = require('react-dom/client')
 const speedtest = require('./lib/speed-test')
 const history = require('./lib/history')
 const sl = require('react-sparklines')
@@ -21,7 +21,12 @@ let globalBlockList = []
 speedtest.onBlocklistUpdate(blockList => (globalBlockList = blockList))
 
 function render(jsx) {
-  ReactDom.render(jsx, document.getElementById('content'))
+  const container = document.getElementById('content')
+  if (!container._root) {
+    container.innerHTML = ''
+    container._root = createRoot(container)
+  }
+  container._root.render(jsx)
 }
 
 const Table = class extends React.Component {
