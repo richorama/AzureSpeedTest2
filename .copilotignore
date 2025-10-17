@@ -1,0 +1,35 @@
+# GitHub Copilot ignore file
+# Files and directories listed here will be ignored by GitHub Copilot
+
+# Dependencies
+node_modules/
+*.min.js
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# License and documentation (optional - remove if you want Copilot to reference these)
+LICENSE
+*.md
