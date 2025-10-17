@@ -1,10 +1,9 @@
 name: Node CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -12,14 +11,21 @@ jobs:
         node-version: [24.x]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build
+    - name: Install dependencies
+      run: npm install
       env:
         CI: true
+    - name: Build application
+      run: npm run build
+      env:
+        CI: true
+    - name: Test cb.json endpoints
+      run: npm run test:endpoints
+      env:
+        CI: true
+        NODE_ENV: production
