@@ -1,7 +1,7 @@
 const React = require('react')
 const { createRoot } = require('react-dom/client')
-const speedtest = require('./lib/speed-test')
-const history = require('./lib/history')
+import * as speedtest from './lib/speed-test.js'
+import * as history from './lib/history.js'
 const sl = require('react-sparklines')
 const { Sparklines, SparklinesLine } = sl
 
