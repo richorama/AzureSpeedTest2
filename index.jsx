@@ -12,12 +12,24 @@ const RENDER_THROTTLE_MS = 100
 // Global state
 let globalBlockList = []
 let lastRenderTime = 0
+let progressState = {
+  phase: 'warmup',
+  completed: 0,
+  total: 0,
+  percentage: 0,
+  isVisible: true
+}
 
 // Record history
 speedtest.on(history.record)
 
 // Throttled rendering to prevent excessive DOM updates
 speedtest.on(() => {
+  // Don't render main table during warm-up phase
+  if (progressState.isVisible) {
+    return
+  }
+  
   const now = Date.now()
   if (now - lastRenderTime < RENDER_THROTTLE_MS) {
     return // Skip this render to avoid excessive updates
@@ -36,6 +48,25 @@ speedtest.on(() => {
 // Update blocklist
 speedtest.onBlocklistUpdate(blockList => {
   globalBlockList = blockList
+})
+
+// Track progress during warm-up phase
+speedtest.onProgress(progress => {
+  progressState = { ...progress, isVisible: progress.phase === 'warmup' }
+  
+  if (progress.phase === 'warmup') {
+    // Show progress during warm-up
+    const container = document.getElementById('content')
+    if (container) {
+      render(<ProgressIndicator progress={progressState} />)
+    }
+  } else if (progress.phase === 'testing') {
+    // Switch to main table when warm-up is complete
+    setTimeout(() => {
+      progressState.isVisible = false
+      render(<Table history={history.read()} blockList={globalBlockList} />)
+    }, 500) // Small delay to show completion
+  }
 })/**
  * Render JSX to the content container
  * @param {React.Element} jsx - The JSX element to render
@@ -62,6 +93,58 @@ function render(jsx) {
       container.innerHTML = '<p>Error loading speed test. Please refresh the page.</p>'
     }
   }
+}
+
+/**
+ * Progress indicator component for warm-up phase
+ * @param {Object} props - Component props
+ * @param {Object} props.progress - Progress state object
+ * @returns {React.Element} Progress indicator
+ */
+const ProgressIndicator = ({ progress }) => {
+  const { completed, total, percentage, phase } = progress
+  
+  return (
+    <div className="text-center mt-5">
+      <div className="mb-4">
+        <div className="spinner-border text-primary mb-3" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+        <h4>Initializing Azure Speed Test</h4>
+        <p className="text-muted">
+          {phase === 'warmup' ? 
+            'Warming up connections to all Azure regions...' : 
+            'Starting latency measurements...'
+          }
+        </p>
+      </div>
+      
+      <div className="progress mx-auto" style={{ maxWidth: '400px', height: '8px' }}>
+        <div 
+          className="progress-bar progress-bar-striped progress-bar-animated" 
+          role="progressbar" 
+          style={{ width: `${percentage}%` }}
+          aria-valuenow={percentage}
+          aria-valuemin="0" 
+          aria-valuemax="100"
+        ></div>
+      </div>
+      
+      <div className="mt-2">
+        <small className="text-muted">
+          {completed} of {total} regions initialized ({percentage}%)
+        </small>
+      </div>
+      
+      {phase === 'warmup' && (
+        <div className="mt-3">
+          <small className="text-info">
+            <i className="fas fa-info-circle"></i> First ping to each region includes DNS lookup and is discarded for accuracy
+          </small>
+        </div>
+      )}
+    </div>
+  )
 }
 
 /**
@@ -99,9 +182,7 @@ const renderRow = (item) => {
         {item.name}
       </td>
       <td>
-        <span className={item.average < 100 ? 'text-success' : item.average < 200 ? 'text-warning' : 'text-danger'}>
-          {Math.round(item.average)}ms
-        </span>
+        {Math.round(item.average)}ms
       </td>
       <td style={{ padding: 0 }} className="no-mobile">
         {item.values && item.values.length > 0 && (
@@ -113,7 +194,7 @@ const renderRow = (item) => {
             margin={2}
           >
             <SparklinesLine
-              color={item.average < 100 ? '#28a745' : item.average < 200 ? '#ffc107' : '#dc3545'}
+              color="#B8BABC"
               style={{ strokeWidth: 2 }}
             />
           </Sparklines>
