@@ -257,9 +257,9 @@ const Table = ({ history = [], blockList = [] }) => {
     <div>
       <div className="mb-3">
         <small className="text-muted">
-          Testing {history.length + blockList.length} Azure regions • 
-          {history.length} responding • 
-          {blockList.length} blocked
+          Testing {history.length + blockList.length} Azure regions | {' '}
+          {history.length} responding | {' '}
+          {blockList.length} not responding
         </small>
       </div>
       
