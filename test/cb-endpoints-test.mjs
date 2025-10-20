@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * Azure Speed Test - cb.json Endpoint Test
+ * Azure Speed Test - Endpoint Latency Test
  * 
- * This test verifies that all storage accounts have accessible cb.json files
- * that return the correct JSONP callback format: call('storage_account_name')
+ * This test verifies that all storage accounts are accessible for latency testing.
+ * Any HTTP response (including 404, 500, etc.) is considered successful since we're
+ * only measuring response times, not content validity.
  * 
  * Usage:
  *   node test/cb-endpoints-test.mjs
- *   npm test (if configured in package.json)
+ *   npm run test:endpoints
  */
 
-import https from 'https';
-import http from 'http';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -55,72 +54,22 @@ function log(message, color = 'reset') {
 }
 
 /**
- * Constructs the cb.json URL for a location entry
+ * Constructs the test URL for a location entry
  * Uses explicit URL if provided, otherwise constructs default blob storage URL
  */
-function constructCbUrl(location) {
+function constructTestUrl(location) {
     if (location.url) {
-        return location.url;
+        return location.url + '/speed-test';
     }
-    // Default construction: https://domain.blob.core.windows.net/cb.json
-    return `https://${location.domain}.blob.core.windows.net/cb.json`;
+    // Default construction for latency testing
+    return `https://${location.domain}.blob.core.windows.net/speed-test`;
 }
 
 /**
- * Makes an HTTP request and returns a promise
- */
-function makeRequest(url) {
-    return new Promise((resolve, reject) => {
-        const urlObj = new URL(url);
-        const client = urlObj.protocol === 'https:' ? https : http;
-        
-        const options = {
-            hostname: urlObj.hostname,
-            port: urlObj.port,
-            path: urlObj.pathname + urlObj.search,
-            method: 'GET',
-            timeout: TEST_TIMEOUT,
-            headers: {
-                'User-Agent': 'AzureSpeedTest-CB-Test/1.0'
-            }
-        };
-
-        const req = client.request(options, (res) => {
-            let data = '';
-            
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
-            
-            res.on('end', () => {
-                resolve({
-                    statusCode: res.statusCode,
-                    headers: res.headers,
-                    body: data.trim()
-                });
-            });
-        });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-
-        req.on('timeout', () => {
-            req.destroy();
-            reject(new Error('Request timeout'));
-        });
-
-        req.end();
-    });
-}
-
-/**
- * Tests a single cb.json endpoint
+ * Tests a single endpoint for latency (any HTTP response is considered valid)
  */
 async function testEndpoint(location) {
-    const url = constructCbUrl(location);
-    const expectedContent1 = `call('${location.domain}')`;
-    const expectedContent2 = `call("${location.domain}")`;
+    const url = constructTestUrl(location);
     
     const result = {
         domain: location.domain,
@@ -128,8 +77,6 @@ async function testEndpoint(location) {
         url: url,
         success: false,
         statusCode: null,
-        responseBody: null,
-        contentMatches: false,
         error: null,
         responseTime: null
     };
@@ -137,25 +84,58 @@ async function testEndpoint(location) {
     const startTime = Date.now();
 
     try {
-        const response = await makeRequest(url);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TEST_TIMEOUT);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         result.responseTime = Date.now() - startTime;
-        result.statusCode = response.statusCode;
-        result.responseBody = response.body;
-
-        if (response.statusCode === 200) {
-            result.success = true;
-            // Allow both single and double quotes in the callback
-            result.contentMatches = response.body === expectedContent1 || response.body === expectedContent2;
-            
-            if (!result.contentMatches) {
-                result.error = `Content mismatch. Expected: "${expectedContent1}" or "${expectedContent2}", Got: "${response.body}"`;
+        result.statusCode = response.status;
+        result.success = true; // Any response (including 404, 500, etc.) is considered successful for latency testing
+        
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            result.responseTime = Date.now() - startTime;
+            result.error = 'Request timeout';
+        } else if (error.name === 'TypeError' && error.message.includes('CORS')) {
+            // Try with no-cors mode if CORS fails
+            try {
+                const startTime2 = Date.now();
+                const controller2 = new AbortController();
+                const timeoutId2 = setTimeout(() => controller2.abort(), TEST_TIMEOUT);
+                
+                await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    signal: controller2.signal
+                });
+                
+                clearTimeout(timeoutId2);
+                result.responseTime = Date.now() - startTime2;
+                result.statusCode = 'opaque';
+                result.success = true;
+                
+            } catch (noCorsError) {
+                result.responseTime = Date.now() - startTime;
+                if (noCorsError.name === 'AbortError') {
+                    result.error = 'Request timeout (no-cors)';
+                } else {
+                    result.error = `Network error: ${noCorsError.message}`;
+                }
             }
         } else {
-            result.error = `HTTP ${response.statusCode}`;
+            result.responseTime = Date.now() - startTime;
+            result.error = error.message;
         }
-    } catch (error) {
-        result.responseTime = Date.now() - startTime;
-        result.error = error.message;
     }
 
     return result;
@@ -176,9 +156,20 @@ async function runTestsBatched(locations, batchSize = MAX_CONCURRENT_TESTS) {
         
         results.push(...batchResults);
         
-        // Small delay between batches
+        // Show immediate results for this batch
+        batchResults.forEach(result => {
+            const status = result.success ? '✓' : '✗';
+            const statusColor = result.success ? 'green' : 'red';
+            const responseInfo = result.responseTime ? `${result.responseTime}ms` : 'timeout';
+            const statusCode = result.statusCode ? `HTTP ${result.statusCode}` : '';
+            const errorInfo = result.error ? ` Error: ${result.error}` : '';
+            
+            log(`  ${status} ${result.domain} (${result.name}) ${responseInfo} ${statusCode}${errorInfo}`, statusColor);
+        });
+        
+        // Small delay between batches to be respectful
         if (i + batchSize < locations.length) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
     }
     
@@ -186,104 +177,97 @@ async function runTestsBatched(locations, batchSize = MAX_CONCURRENT_TESTS) {
 }
 
 /**
- * Generates a detailed test report
+ * Generates a summary report of test results
  */
 function generateReport(results) {
-    const successful = results.filter(r => r.success && r.contentMatches);
-    const accessible = results.filter(r => r.success);
-    const failed = results.filter(r => !r.success);
-    const contentMismatches = results.filter(r => r.success && !r.contentMatches);
+    const total = results.length;
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+    const timeouts = results.filter(r => r.error && r.error.includes('timeout')).length;
+    const corsErrors = results.filter(r => r.error && r.error.includes('CORS')).length;
     
-    log('\n=== TEST REPORT ===', 'cyan');
-    log(`Total endpoints tested: ${results.length}`);
-    log(`✓ Fully working (accessible + correct content): ${successful.length}`, 'green');
-    log(`⚠ Accessible but wrong content: ${contentMismatches.length}`, 'yellow');
-    log(`✗ Failed/inaccessible: ${failed.length}`, 'red');
+    // Calculate statistics for successful tests
+    const successfulTests = results.filter(r => r.success && r.responseTime);
+    const responseTimes = successfulTests.map(r => r.responseTime);
     
-    if (successful.length > 0) {
-        log('\n--- WORKING ENDPOINTS ---', 'green');
-        successful.forEach(result => {
-            log(`✓ ${result.domain} (${result.name}) - ${result.responseTime}ms`, 'green');
-            log(`  URL: ${result.url}`);
-        });
-    }
+    let avgTime = 0;
+    let minTime = 0;
+    let maxTime = 0;
     
-    if (contentMismatches.length > 0) {
-        log('\n--- CONTENT MISMATCHES ---', 'yellow');
-        contentMismatches.forEach(result => {
-            log(`⚠ ${result.domain} (${result.name})`, 'yellow');
-            log(`  URL: ${result.url}`);
-            log(`  Error: ${result.error}`);
-        });
-    }
-    
-    if (failed.length > 0) {
-        log('\n--- FAILED ENDPOINTS ---', 'red');
-        failed.forEach(result => {
-            log(`✗ ${result.domain} (${result.name})`, 'red');
-            log(`  URL: ${result.url}`);
-            log(`  Error: ${result.error || 'Unknown error'}`);
-        });
+    if (responseTimes.length > 0) {
+        avgTime = Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length);
+        minTime = Math.min(...responseTimes);
+        maxTime = Math.max(...responseTimes);
     }
 
-    // Performance summary
-    const responseTimes = results.filter(r => r.responseTime !== null).map(r => r.responseTime);
-    if (responseTimes.length > 0) {
-        const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
-        const maxResponseTime = Math.max(...responseTimes);
-        log(`\n--- PERFORMANCE ---`, 'cyan');
-        log(`Average response time: ${Math.round(avgResponseTime)}ms`);
-        log(`Maximum response time: ${maxResponseTime}ms`);
+    const summary = {
+        total,
+        successful,
+        failed,
+        timeouts,
+        corsErrors,
+        avgTime,
+        minTime,
+        maxTime
+    };
+
+    // Print detailed report
+    log('\n' + '='.repeat(60), 'cyan');
+    log('ENDPOINT LATENCY TEST SUMMARY', 'cyan');
+    log('='.repeat(60), 'cyan');
+    log(`Total endpoints tested: ${total}`, 'blue');
+    log(`Successful tests: ${successful}`, successful === total ? 'green' : 'yellow');
+    log(`Failed tests: ${failed}`, failed > 0 ? 'red' : 'green');
+    
+    if (timeouts > 0) {
+        log(`Timeouts: ${timeouts}`, 'yellow');
     }
     
-    return {
-        total: results.length,
-        successful: successful.length,
-        accessible: accessible.length,
-        failed: failed.length,
-        contentMismatches: contentMismatches.length
-    };
+    if (corsErrors > 0) {
+        log(`CORS errors: ${corsErrors}`, 'yellow');
+    }
+    
+    if (responseTimes.length > 0) {
+        log(`Average response time: ${avgTime}ms`, 'blue');
+        log(`Fastest response: ${minTime}ms`, 'green');
+        log(`Slowest response: ${maxTime}ms`, 'yellow');
+    }
+    
+    // Show failed endpoints
+    if (failed > 0) {
+        log('\nFAILED ENDPOINTS:', 'red');
+        results.filter(r => !r.success).forEach(result => {
+            log(`  ✗ ${result.domain} (${result.name}) - ${result.error}`, 'red');
+        });
+    }
+    
+    return summary;
 }
 
 /**
  * Main test function
  */
 async function main() {
-    log('Azure Speed Test - cb.json Endpoint Verification', 'cyan');
-    log('=================================================', 'cyan');
+    log('Starting Azure Speed Test endpoint latency tests...', 'cyan');
+    log('Note: Any HTTP response (including 404s) is considered successful for latency testing\n', 'yellow');
     
-    // Get all locations
     const locations = getLocations();
     log(`Found ${locations.length} locations to test\n`, 'blue');
     
-    // Show what we're testing
-    log('Testing strategy:', 'blue');
-    log('- Use explicit URL if location.url is defined');
-    log('- Otherwise construct: https://{domain}.blob.core.windows.net/cb.json');
-    log('- Expect response: call(\'{domain}\')');
-    log(`- Timeout: ${TEST_TIMEOUT}ms per request\n`);
-    
-    // Run tests
-    const startTime = Date.now();
     const results = await runTestsBatched(locations);
-    const totalTime = Date.now() - startTime;
-    
-    // Generate report
     const summary = generateReport(results);
     
-    log(`\nTotal test time: ${Math.round(totalTime/1000)}s`, 'cyan');
-    
     // Return appropriate exit code
-    const hasFailures = summary.failed > 0 || summary.contentMismatches > 0;
+    const hasFailures = summary.failed > 0;
     
     if (hasFailures) {
-        log('\n❌ Some endpoints failed or have incorrect content', 'red');
+        log('\n❌ Some endpoints failed (timeouts or network errors)', 'red');
         if (process.env.CI) {
             log('This may be expected in CI if storage accounts are still deploying', 'yellow');
         }
         return 1;
     } else {
-        log('\n✅ All endpoints are working correctly!', 'green');
+        log('\n✅ All endpoints responded successfully for latency testing!', 'green');
         return 0;
     }
 }
@@ -303,7 +287,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export {
     testEndpoint,
-    constructCbUrl,
+    constructTestUrl,
     generateReport,
     main
 };
