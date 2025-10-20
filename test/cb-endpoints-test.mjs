@@ -69,10 +69,11 @@ async function testEndpoint(location) {
     };
 
     const startTime = Date.now();
+    let timeoutId;
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), TEST_TIMEOUT);
+        timeoutId = setTimeout(() => controller.abort(), TEST_TIMEOUT);
         
         const response = await fetch(url, {
             method: 'GET',
@@ -87,7 +88,7 @@ async function testEndpoint(location) {
         result.success = true; // Any response (including 404, 500, etc.) is considered successful for latency testing
         
     } catch (error) {
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
         
         if (error.name === 'AbortError') {
             result.responseTime = Date.now() - startTime;
