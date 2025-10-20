@@ -12,28 +12,15 @@
  *   npm run test:endpoints
  */
 
-import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 // Get __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Read and parse locations.js as text since it's CommonJS
-const locationsPath = join(__dirname, '../lib/locations.js');
-const locationsContent = readFileSync(locationsPath, 'utf8');
-
-// Use eval to execute the module.exports function in a safe context
-// Extract just the function part
-const funcMatch = locationsContent.match(/module\.exports = (\(\) => \[[\s\S]*?\]);/);
-if (!funcMatch) {
-    throw new Error('Could not parse locations.js');
-}
-
-// Evaluate the function and call it to get the array
-const getLocationsFunc = eval(funcMatch[1]);
-const getLocations = getLocationsFunc;
+// Import locations.js as an ES6 module
+import getLocations from '../lib/locations.js';
 
 // Test configuration
 const TEST_TIMEOUT = 10000; // 10 seconds
@@ -82,10 +69,11 @@ async function testEndpoint(location) {
     };
 
     const startTime = Date.now();
+    let timeoutId;
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), TEST_TIMEOUT);
+        timeoutId = setTimeout(() => controller.abort(), TEST_TIMEOUT);
         
         const response = await fetch(url, {
             method: 'GET',
@@ -100,7 +88,7 @@ async function testEndpoint(location) {
         result.success = true; // Any response (including 404, 500, etc.) is considered successful for latency testing
         
     } catch (error) {
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
         
         if (error.name === 'AbortError') {
             result.responseTime = Date.now() - startTime;
