@@ -12,6 +12,104 @@
     <title>Azure Speed Test 2.0</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #212529;
+            --jumbotron-bg: #e9ecef;
+            --table-bg: #ffffff;
+            --table-hover-bg: #f8f9fa;
+            --table-border-color: #dee2e6;
+            --progress-bg: #e9ecef;
+            --badge-bg: #dc3545;
+            --sparkline-color: #B8BABC;
+            --row-gradient-color: #e9ecef;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --jumbotron-bg: #343a40;
+            --table-bg: #2b3035;
+            --table-hover-bg: #343a40;
+            --table-border-color: #495057;
+            --progress-bg: #495057;
+            --badge-bg: #dc3545;
+            --sparkline-color: #6c757d;
+            --row-gradient-color: #343a40;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg-color: #212529;
+                --text-color: #f8f9fa;
+                --jumbotron-bg: #343a40;
+                --table-bg: #2b3035;
+                --table-hover-bg: #343a40;
+                --table-border-color: #495057;
+                --progress-bg: #495057;
+                --badge-bg: #dc3545;
+                --sparkline-color: #6c757d;
+                --row-gradient-color: #343a40;
+            }
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .jumbotron {
+            background-color: var(--jumbotron-bg);
+            color: var(--text-color);
+        }
+
+        .table {
+            background-color: var(--table-bg);
+            color: var(--text-color);
+        }
+
+        .table thead th {
+            background-color: var(--table-hover-bg);
+            color: var(--text-color);
+            border-color: var(--table-border-color);
+        }
+
+        .table td, .table th {
+            border-color: var(--table-border-color);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--table-hover-bg);
+            color: var(--text-color);
+        }
+
+        .progress {
+            background-color: var(--progress-bg);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--jumbotron-bg);
+            border: 1px solid var(--table-border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
  
         .icon {
             width: 25px;
@@ -68,6 +166,20 @@
 
     <noscript>You need to enabled JavaScript for this web application to work.</noscript>
 
+    <script>
+        // Initialize theme before content loads to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                // Check system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+        })();
+    </script>
     <script>
         // Suppress network error messages in console for cleaner output during latency testing
         // Save original console.error for debugging purposes if needed

@@ -20,6 +20,36 @@ let progressState = {
   isVisible: true
 }
 
+// Theme management
+const getTheme = () => {
+  const saved = localStorage.getItem('theme')
+  if (saved) return saved
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark'
+  }
+  return 'light'
+}
+
+const setTheme = (theme) => {
+  localStorage.setItem('theme', theme)
+  document.documentElement.setAttribute('data-theme', theme)
+}
+
+const toggleTheme = () => {
+  const current = getTheme()
+  const next = current === 'dark' ? 'light' : 'dark'
+  setTheme(next)
+  // Re-render to update the toggle button
+  const container = document.getElementById('content')
+  if (container && container._root) {
+    container._root.render(
+      progressState.isVisible 
+        ? <ProgressIndicator progress={progressState} />
+        : <Table history={history.read()} blockList={globalBlockList} />
+    )
+  }
+}
+
 // Record history
 speedtest.on(history.record)
 
@@ -96,6 +126,32 @@ function render(jsx) {
 }
 
 /**
+ * Theme toggle button component
+ * @returns {React.Element} Theme toggle button
+ */
+const ThemeToggle = () => {
+  const [theme, setThemeState] = React.useState(getTheme())
+  
+  const handleToggle = () => {
+    const current = getTheme()
+    const next = current === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    setThemeState(next)
+  }
+  
+  return (
+    <button
+      className="theme-toggle"
+      onClick={handleToggle}
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {theme === 'dark' ? '☀️' : '🌙'}
+    </button>
+  )
+}
+
+/**
  * Progress indicator component for warm-up phase
  * @param {Object} props - Component props
  * @param {Object} props.progress - Progress state object
@@ -105,7 +161,9 @@ const ProgressIndicator = ({ progress }) => {
   const { completed, total, percentage, phase } = progress
   
   return (
-    <div className="text-center mt-5">
+    <div>
+      <ThemeToggle />
+      <div className="text-center mt-5">
       <div className="mb-4">
         <div className="spinner-border text-primary mb-3" role="status">
           <span className="sr-only">Loading...</span>
@@ -143,6 +201,7 @@ const ProgressIndicator = ({ progress }) => {
           </small>
         </div>
       )}
+      </div>
     </div>
   )
 }
@@ -171,8 +230,12 @@ const renderFlag = (item) => {
  */
 const renderRow = (item) => {
   const percentage = Math.min(Math.round(item.percent || 0), 100)
+  const gradientColor = getComputedStyle(document.documentElement).getPropertyValue('--row-gradient-color').trim()
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--table-bg').trim()
+  const sparklineColor = getComputedStyle(document.documentElement).getPropertyValue('--sparkline-color').trim()
+  
   const rowStyle = {
-    backgroundImage: `linear-gradient(to right, #e9ecef ${percentage}%, #ffffff ${percentage}%)`
+    backgroundImage: `linear-gradient(to right, ${gradientColor} ${percentage}%, ${bgColor} ${percentage}%)`
   }
 
   return (
@@ -194,7 +257,7 @@ const renderRow = (item) => {
             margin={2}
           >
             <SparklinesLine
-              color="#B8BABC"
+              color={sparklineColor}
               style={{ strokeWidth: 2 }}
             />
           </Sparklines>
@@ -255,6 +318,7 @@ const Table = ({ history = [], blockList = [] }) => {
   
   return (
     <div>
+      <ThemeToggle />
       <div className="mb-3">
         <small className="text-muted">
           Testing {history.length + blockList.length} Azure regions | {' '}
