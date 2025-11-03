@@ -35,21 +35,6 @@ const setTheme = (theme) => {
   document.documentElement.setAttribute('data-theme', theme)
 }
 
-const toggleTheme = () => {
-  const current = getTheme()
-  const next = current === 'dark' ? 'light' : 'dark'
-  setTheme(next)
-  // Re-render to update the toggle button
-  const container = document.getElementById('content')
-  if (container && container._root) {
-    container._root.render(
-      progressState.isVisible 
-        ? <ProgressIndicator progress={progressState} />
-        : <Table history={history.read()} blockList={globalBlockList} />
-    )
-  }
-}
-
 // Record history
 speedtest.on(history.record)
 
@@ -65,6 +50,9 @@ speedtest.on(() => {
     return // Skip this render to avoid excessive updates
   }
   lastRenderTime = now
+  
+  // Clear CSS cache before re-render to pick up theme changes
+  cssVariablesCache = null
   
   const scrollPosition = window.scrollY
   render(<Table history={history.read()} blockList={globalBlockList} />)
@@ -137,6 +125,8 @@ const ThemeToggle = () => {
     const next = current === 'dark' ? 'light' : 'dark'
     setTheme(next)
     setThemeState(next)
+    // Clear CSS cache to pick up new theme colors
+    cssVariablesCache = null
   }
   
   return (
@@ -224,15 +214,29 @@ const renderFlag = (item) => {
 }
 
 /**
+ * Get CSS variable values (cached per render cycle)
+ */
+let cssVariablesCache = null
+const getCSSVariables = () => {
+  if (!cssVariablesCache) {
+    const styles = getComputedStyle(document.documentElement)
+    cssVariablesCache = {
+      gradientColor: styles.getPropertyValue('--row-gradient-color').trim(),
+      bgColor: styles.getPropertyValue('--table-bg').trim(),
+      sparklineColor: styles.getPropertyValue('--sparkline-color').trim()
+    }
+  }
+  return cssVariablesCache
+}
+
+/**
  * Render a data row for active locations
  * @param {Object} item - Location data with latency information
  * @returns {React.Element} Table row element
  */
 const renderRow = (item) => {
   const percentage = Math.min(Math.round(item.percent || 0), 100)
-  const gradientColor = getComputedStyle(document.documentElement).getPropertyValue('--row-gradient-color').trim()
-  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--table-bg').trim()
-  const sparklineColor = getComputedStyle(document.documentElement).getPropertyValue('--sparkline-color').trim()
+  const { gradientColor, bgColor, sparklineColor } = getCSSVariables()
   
   const rowStyle = {
     backgroundImage: `linear-gradient(to right, ${gradientColor} ${percentage}%, ${bgColor} ${percentage}%)`
