@@ -158,6 +158,48 @@ const ThemeToggle = () => {
 }
 
 /**
+ * Pause toggle button component
+ * @returns {React.Element} Pause toggle button
+ */
+const PauseToggle = () => {
+  const [paused, setPaused] = React.useState(speedtest.isPaused())
+  
+  React.useEffect(() => {
+    // Listen for pause state changes
+    const unsubscribe = speedtest.onPauseChange(setPaused)
+    return unsubscribe // Cleanup on unmount
+  }, [])
+  
+  const handleToggle = () => {
+    if (paused) {
+      speedtest.resume()
+    } else {
+      speedtest.pause()
+    }
+  }
+  
+  return (
+    <button
+      className="pause-toggle"
+      onClick={handleToggle}
+      title={paused ? 'Resume testing' : 'Pause testing'}
+      aria-label={paused ? 'Resume testing' : 'Pause testing'}
+    >
+      {paused ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6">
+          <rect x="6" y="4" width="4" height="16"/>
+          <rect x="14" y="4" width="4" height="16"/>
+        </svg>
+      )}
+    </button>
+  )
+}
+
+/**
  * Progress indicator component for warm-up phase
  * @param {Object} props - Component props
  * @param {Object} props.progress - Progress state object
@@ -169,6 +211,7 @@ const ProgressIndicator = ({ progress }) => {
   return (
     <div>
       <ThemeToggle />
+      <PauseToggle />
       <div className="text-center mt-5">
       <div className="mb-4">
         <div className="spinner-border text-primary mb-3" role="status">
@@ -339,6 +382,7 @@ const Table = ({ history = [], blockList = [] }) => {
   return (
     <div>
       <ThemeToggle />
+      <PauseToggle />
       <div className="mb-3">
         <small className="text-muted">
           Testing {history.length + blockList.length} Azure regions | {' '}
