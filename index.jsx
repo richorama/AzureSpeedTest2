@@ -20,6 +20,21 @@ let progressState = {
   isVisible: true
 }
 
+// Theme management
+const getTheme = () => {
+  const saved = localStorage.getItem('theme')
+  if (saved) return saved
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark'
+  }
+  return 'light'
+}
+
+const setTheme = (theme) => {
+  localStorage.setItem('theme', theme)
+  document.documentElement.setAttribute('data-theme', theme)
+}
+
 // Record history
 speedtest.on(history.record)
 
@@ -35,6 +50,9 @@ speedtest.on(() => {
     return // Skip this render to avoid excessive updates
   }
   lastRenderTime = now
+  
+  // Clear CSS cache before re-render to pick up theme changes
+  cssVariablesCache = null
   
   const scrollPosition = window.scrollY
   render(<Table history={history.read()} blockList={globalBlockList} />)
@@ -96,6 +114,50 @@ function render(jsx) {
 }
 
 /**
+ * Theme toggle button component
+ * @returns {React.Element} Theme toggle button
+ */
+const ThemeToggle = () => {
+  const [theme, setThemeState] = React.useState(getTheme())
+  
+  const handleToggle = () => {
+    const current = getTheme()
+    const next = current === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    setThemeState(next)
+    // Clear CSS cache to pick up new theme colors
+    cssVariablesCache = null
+  }
+  
+  return (
+    <button
+      className="theme-toggle"
+      onClick={handleToggle}
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {theme === 'dark' ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      )}
+    </button>
+  )
+}
+
+/**
  * Progress indicator component for warm-up phase
  * @param {Object} props - Component props
  * @param {Object} props.progress - Progress state object
@@ -105,7 +167,9 @@ const ProgressIndicator = ({ progress }) => {
   const { completed, total, percentage, phase } = progress
   
   return (
-    <div className="text-center mt-5">
+    <div>
+      <ThemeToggle />
+      <div className="text-center mt-5">
       <div className="mb-4">
         <div className="spinner-border text-primary mb-3" role="status">
           <span className="sr-only">Loading...</span>
@@ -143,6 +207,7 @@ const ProgressIndicator = ({ progress }) => {
           </small>
         </div>
       )}
+      </div>
     </div>
   )
 }
@@ -165,14 +230,32 @@ const renderFlag = (item) => {
 }
 
 /**
+ * Get CSS variable values (cached per render cycle)
+ */
+let cssVariablesCache = null
+const getCSSVariables = () => {
+  if (!cssVariablesCache) {
+    const styles = getComputedStyle(document.documentElement)
+    cssVariablesCache = {
+      gradientColor: styles.getPropertyValue('--row-gradient-color').trim(),
+      bgColor: styles.getPropertyValue('--table-bg').trim(),
+      sparklineColor: styles.getPropertyValue('--sparkline-color').trim()
+    }
+  }
+  return cssVariablesCache
+}
+
+/**
  * Render a data row for active locations
  * @param {Object} item - Location data with latency information
  * @returns {React.Element} Table row element
  */
 const renderRow = (item) => {
   const percentage = Math.min(Math.round(item.percent || 0), 100)
+  const { gradientColor, bgColor, sparklineColor } = getCSSVariables()
+  
   const rowStyle = {
-    backgroundImage: `linear-gradient(to right, #e9ecef ${percentage}%, #ffffff ${percentage}%)`
+    backgroundImage: `linear-gradient(to right, ${gradientColor} ${percentage}%, ${bgColor} ${percentage}%)`
   }
 
   return (
@@ -194,7 +277,7 @@ const renderRow = (item) => {
             margin={2}
           >
             <SparklinesLine
-              color="#B8BABC"
+              color={sparklineColor}
               style={{ strokeWidth: 2 }}
             />
           </Sparklines>
@@ -255,6 +338,7 @@ const Table = ({ history = [], blockList = [] }) => {
   
   return (
     <div>
+      <ThemeToggle />
       <div className="mb-3">
         <small className="text-muted">
           Testing {history.length + blockList.length} Azure regions | {' '}
