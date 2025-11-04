@@ -18,6 +18,7 @@
             --jumbotron-bg: #e9ecef;
             --table-bg: #ffffff;
             --table-hover-bg: #f8f9fa;
+            --table-header-bg: #e9ecef;
             --table-border-color: #dee2e6;
             --progress-bg: #e9ecef;
             --badge-bg: #dc3545;
@@ -31,6 +32,7 @@
             --jumbotron-bg: #343a40;
             --table-bg: #2b3035;
             --table-hover-bg: #343a40;
+            --table-header-bg: #24282d;
             --table-border-color: #495057;
             --progress-bg: #495057;
             --badge-bg: #dc3545;
@@ -45,6 +47,7 @@
                 --jumbotron-bg: #343a40;
                 --table-bg: #2b3035;
                 --table-hover-bg: #343a40;
+                --table-header-bg: #24282d;
                 --table-border-color: #495057;
                 --progress-bg: #495057;
                 --badge-bg: #dc3545;
@@ -70,9 +73,15 @@
         }
 
         .table thead th {
-            background-color: var(--table-hover-bg);
+            background-color: var(--table-header-bg);
             color: var(--text-color);
             border-color: var(--table-border-color);
+        }
+
+        .table .thead-light th {
+            background-color: var(--table-header-bg) !important;
+            color: var(--text-color) !important;
+            border-color: var(--table-border-color) !important;
         }
 
         .table td, .table th {
@@ -89,26 +98,30 @@
         }
 
         .theme-toggle {
-            position: fixed;
+            position: absolute;
             top: 20px;
             right: 20px;
             z-index: 1000;
-            background: var(--jumbotron-bg);
-            border: 1px solid var(--table-border-color);
+            background: transparent;
+            border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        .theme-toggle svg {
+            display: block;
         }
 
         .theme-toggle:hover {
             transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
  
         .icon {
