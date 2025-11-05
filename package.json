@@ -6,7 +6,7 @@
     "watch": "watchify -v -t babelify index.jsx -g [ envify --NODE_ENV development ] -o index.min.js",
     "build": "npm run lint && npm run browserify",
     "lint": "eslint . --ext .js --ext .jsx",
-    "browserify": "browserify -t babelify index.jsx  -g [ envify --NODE_ENV production ] -g uglifyify  | uglifyjs --compress --mangle > index.min.js",
+    "browserify": "browserify -t babelify index.jsx -g [ envify --NODE_ENV production ] | uglifyjs --compress --mangle > index.min.js",
     "test": "node test/cb-endpoints-test.mjs",
     "test:endpoints": "node test/cb-endpoints-test.mjs"
   },
@@ -27,7 +27,6 @@
     "eslint-plugin-react": "^7.37.5",
     "mocha": "^11.5.0",
     "uglify-js": "^3.19.3",
-    "uglifyify": "^5.0.2",
     "watchify": "^4.0.0"
   },
   "type": "module"
