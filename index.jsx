@@ -306,6 +306,16 @@ const renderRow = (item) => {
       <td>
         {renderFlag(item)}
         {item.name}
+        {item.location && (
+          <small className="text-muted" style={{ marginLeft: '8px' }}>
+            {item.location}
+            {item.availabilityZones && (
+              <span className="badge badge-light" style={{ marginLeft: '6px', fontSize: '0.7em' }}>
+                AZ
+              </span>
+            )}
+          </small>
+        )}
       </td>
       <td>
         {Math.round(item.average)}ms
@@ -350,6 +360,16 @@ const renderError = (item) => {
       <td>
         {renderFlag(item)}
         {item.name}
+        {item.location && (
+          <small className="text-muted" style={{ marginLeft: '8px' }}>
+            {item.location}
+            {item.availabilityZones && (
+              <span className="badge badge-light" style={{ marginLeft: '6px', fontSize: '0.7em' }}>
+                AZ
+              </span>
+            )}
+          </small>
+        )}
       </td>
       <td>
         <span className="badge badge-danger">NO RESPONSE</span>
@@ -388,6 +408,8 @@ const Table = ({ history = [], blockList = [] }) => {
           Testing {history.length + blockList.length} Azure regions | {' '}
           {history.length} responding | {' '}
           {blockList.length} not responding
+          {' | '}
+          <span className="badge badge-light" style={{ fontSize: '0.8em' }}>AZ</span> = Availability Zones Supported
         </small>
       </div>
       

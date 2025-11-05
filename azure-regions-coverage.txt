@@ -1,0 +1,72 @@
+# Azure Regions Coverage
+
+## Regions Available in Azure Speed Test 2.0 (49 regions)
+
+All regions in the tool now include:
+- Official Microsoft region name
+- Physical location
+- Geography
+- Availability Zones support indicator
+
+### Coverage by Geography:
+- **United States**: 9 regions
+- **Europe**: 11 regions  
+- **Asia Pacific**: 8 regions
+- **Australia**: 4 regions
+- **United Kingdom**: 2 regions
+- **Canada**: 2 regions
+- **India**: 4 regions (including Jio India West)
+- **Korea**: 2 regions
+- **Middle East**: 3 regions (UAE, Qatar, Israel)
+- **Africa**: 1 region
+- **South America**: 2 regions (Brazil, Chile)
+- **Japan**: 2 regions
+
+## Azure Regions NOT Available in the Tool
+
+The following Azure regions are listed in the [official Microsoft documentation](https://learn.microsoft.com/en-us/azure/reliability/regions-list#azure-regions-list-1) but are **not currently available** in this speed test tool:
+
+### Restricted Access Regions
+These regions require special access approval from Microsoft:
+
+1. **Australia Central 2** - Canberra, Australia (paired with Australia Central)
+2. **Belgium Central** - Brussels, Belgium (Coming soon, has Availability Zones)
+3. **Brazil Southeast** - Rio, Brazil (paired with Brazil South)
+4. **France South** - Marseille, France (paired with France Central)
+5. **Germany North** - Berlin, Germany (paired with Germany West Central)
+6. **Norway West** - Norway (paired with Norway East)
+7. **South Africa West** - Cape Town, South Africa (paired with South Africa North)
+8. **Sweden South** - Sweden (paired with Sweden Central)
+9. **Switzerland West** - Geneva, Switzerland (paired with Switzerland North)
+10. **UAE Central** - Abu Dhabi, UAE (paired with UAE North)
+
+### Summary
+- **Total Azure Regions**: 59 (as of documentation update 09/30/2025)
+- **Regions in Tool**: 49
+- **Regions Not Available**: 10 (all restricted access)
+- **Coming Soon**: Belgium Central (restricted, with Availability Zones)
+
+### Notes
+- "West Europe 2" and "Australia Southeast 2" in the tool appear to be duplicate entries or older naming conventions
+- "Jio India West" is a specialized region not in the standard Microsoft list
+- All restricted regions require special approval through the Azure region access request process
+
+## Availability Zones Coverage
+
+Of the 49 regions available in the tool:
+- **With Availability Zones**: 39 regions (80%)
+- **Without Availability Zones**: 10 regions (20%)
+
+Regions without Availability Zones:
+1. North Central US
+2. West US
+3. Australia Southeast
+4. Australia Southeast 2
+5. UK West
+6. Canada East
+7. West India
+8. South India
+9. Korea South
+10. West Central US
+11. Australia Central
+12. Jio India West
