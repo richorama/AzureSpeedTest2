@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Azure blue background -->
+  <rect width="100" height="100" fill="#0078D4" rx="15"/>
+  
+  <!-- Speed/lightning bolt icon in white -->
+  <path d="M60 15 L35 50 L48 50 L40 85 L75 45 L60 45 Z" fill="#FFFFFF"/>
+</svg>
