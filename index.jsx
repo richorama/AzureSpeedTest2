@@ -12,6 +12,7 @@ const RENDER_THROTTLE_MS = 100
 // Global state
 let globalBlockList = []
 let lastRenderTime = 0
+let globalStats = { requestsPerSecond: 0 }
 let progressState = {
   phase: 'warmup',
   completed: 0,
@@ -51,11 +52,14 @@ speedtest.on(() => {
   }
   lastRenderTime = now
   
+  // Update stats
+  globalStats = speedtest.getStats()
+  
   // Clear CSS cache before re-render to pick up theme changes
   cssVariablesCache = null
   
   const scrollPosition = window.scrollY
-  render(<Table history={history.read()} blockList={globalBlockList} />)
+  render(<Table history={history.read()} blockList={globalBlockList} stats={globalStats} />)
   
   // Preserve scroll position after render
   if (Math.abs(window.scrollY - scrollPosition) > 5) {
@@ -82,10 +86,25 @@ speedtest.onProgress(progress => {
     // Switch to main table when warm-up is complete
     setTimeout(() => {
       progressState.isVisible = false
-      render(<Table history={history.read()} blockList={globalBlockList} />)
+      render(<Table history={history.read()} blockList={globalBlockList} stats={globalStats} />)
     }, 500) // Small delay to show completion
   }
-})/**
+})
+
+// Update stats periodically
+setInterval(() => {
+  if (!progressState.isVisible) {
+    globalStats = speedtest.getStats()
+    // Trigger a render to update the stats display
+    const scrollPosition = window.scrollY
+    render(<Table history={history.read()} blockList={globalBlockList} stats={globalStats} />)
+    if (Math.abs(window.scrollY - scrollPosition) > 5) {
+      window.scrollTo(0, scrollPosition)
+    }
+  }
+}, 1000) // Update every second
+
+/**
  * Render JSX to the content container
  * @param {React.Element} jsx - The JSX element to render
  */
@@ -393,9 +412,10 @@ const renderError = (item) => {
  * @param {Object} props - Component props
  * @param {Array} props.history - Array of location latency data
  * @param {Array} props.blockList - Array of blocked/failed locations
+ * @param {Object} props.stats - Statistics object with request metrics
  * @returns {React.Element} Complete results table
  */
-const Table = ({ history = [], blockList = [] }) => {
+const Table = ({ history = [], blockList = [], stats = {} }) => {
   // Sort history by average latency for better UX
   const sortedHistory = [...history].sort((a, b) => (a.average || Infinity) - (b.average || Infinity))
   
@@ -407,7 +427,8 @@ const Table = ({ history = [], blockList = [] }) => {
         <small className="text-muted">
           Testing {history.length + blockList.length} Azure regions | {' '}
           {history.length} responding | {' '}
-          {blockList.length} not responding
+          {blockList.length} not responding | {' '}
+          {stats.requestsPerSecond ? Math.round(stats.requestsPerSecond) : '0'} req/sec
           {' | '}
           <span className="badge badge-light" style={{ fontSize: '0.8em' }}>AZ</span> = Availability Zones Supported
         </small>
