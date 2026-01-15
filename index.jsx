@@ -466,7 +466,6 @@ const Table = ({ history = [], blockList = [], stats = {} }) => {
             <h6>Contributors</h6>
             <ul className="list-unstyled">
               <li><a href="https://github.com/TimNilimaa" target="_blank" rel="noopener noreferrer">Tim Nilimaa</a> - Regional contributions and code improvements</li>
-              <li><a href="https://github.com/ncareau" target="_blank" rel="noopener noreferrer">NMC</a> - Canada storage accounts</li>
               <li><a href="https://github.com/jurajsucik" target="_blank" rel="noopener noreferrer">Juraj Sucik</a> - Switzerland and Germany accounts</li>
               <li><a href="https://github.com/wi5nia" target="_blank" rel="noopener noreferrer">Tomasz Wisniewski</a> - Poland Central account</li>
             </ul>
