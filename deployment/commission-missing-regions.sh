@@ -18,7 +18,6 @@ MISSING_REGIONS=(
     ["jioindiacentral"]="Jio India Central"
     ["norwaywest"]="Norway West"
     ["southafricawest"]="South Africa West"
-    ["spaincentral"]="Spain Central"
     ["switzerlandwest"]="Switzerland West"
     ["taiwan"]="Taiwan"
     ["uaecentral"]="UAE Central"
@@ -74,7 +73,6 @@ for region in "${!MISSING_REGIONS[@]}"; do
                 "jioindiacentral") icon="in.svg" ;;
                 "norwaywest") icon="no.svg" ;;
                 "southafricawest") icon="za.svg" ;;
-                "spaincentral") icon="es.svg" ;;
                 "switzerlandwest") icon="ch.svg" ;;
                 "taiwan") icon="tw.svg" ;;
                 "uaecentral") icon="ae.svg" ;;
