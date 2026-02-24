@@ -1,6 +1,6 @@
 # Azure Regions Coverage
 
-## Regions Available in Azure Speed Test 2.0 (49 regions)
+## Regions Available in Azure Speed Test 2.0 (47 regions)
 
 All regions in the tool now include:
 - Official Microsoft region name
@@ -14,7 +14,6 @@ All regions in the tool now include:
 - **Asia Pacific**: 8 regions
 - **Australia**: 4 regions
 - **United Kingdom**: 2 regions
-- **Canada**: 2 regions
 - **India**: 4 regions (including Jio India West)
 - **Korea**: 2 regions
 - **Middle East**: 3 regions (UAE, Qatar, Israel)
@@ -42,7 +41,7 @@ These regions require special access approval from Microsoft:
 
 ### Summary
 - **Total Azure Regions**: 59 (as of documentation update 09/30/2025)
-- **Regions in Tool**: 49
+- **Regions in Tool**: 47
 - **Regions Not Available**: 10 (all restricted access)
 - **Coming Soon**: Belgium Central (restricted, with Availability Zones)
 
@@ -53,9 +52,9 @@ These regions require special access approval from Microsoft:
 
 ## Availability Zones Coverage
 
-Of the 49 regions available in the tool:
-- **With Availability Zones**: 39 regions (80%)
-- **Without Availability Zones**: 10 regions (20%)
+Of the 47 regions available in the tool:
+- **With Availability Zones**: 37 regions (79%)
+- **Without Availability Zones**: 10 regions (21%)
 
 Regions without Availability Zones:
 1. North Central US
@@ -63,10 +62,9 @@ Regions without Availability Zones:
 3. Australia Southeast
 4. Australia Southeast 2
 5. UK West
-6. Canada East
-7. West India
-8. South India
-9. Korea South
-10. West Central US
-11. Australia Central
-12. Jio India West
+6. West India
+7. South India
+8. Korea South
+9. West Central US
+10. Australia Central
+11. Jio India West
