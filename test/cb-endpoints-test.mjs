@@ -49,7 +49,7 @@ function constructTestUrl(location) {
         return location.url + '/speed-test';
     }
     // Default construction for latency testing
-    return `https://${location.domain}.blob.core.windows.net/speed-test`;
+    return `https://${location.domain}.blob.core.windows.net/cb.json`;
 }
 
 /**
