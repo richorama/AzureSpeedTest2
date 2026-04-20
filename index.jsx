@@ -364,7 +364,7 @@ const renderRow = (item) => {
  * @param {Object} item - Blocked location data
  * @returns {React.Element} Error table row
  */
-const renderError = (item) => {
+const renderError = (item, historyData) => {
   const handleRetry = (e) => {
     e.preventDefault()
     try {
@@ -374,8 +374,10 @@ const renderError = (item) => {
     }
   }
 
+  const { sparklineColor } = getCSSVariables()
+
   return (
-    <tr key={item.name}>
+    <tr key={item.name} className="blocked-row">
       <td>
         {renderFlag(item)}
         {item.name}
@@ -392,16 +394,37 @@ const renderError = (item) => {
       </td>
       <td>
         <span className="badge badge-danger">NO RESPONSE</span>
-      </td>
-      <td className="no-mobile">
+        {historyData && historyData.average > 0 && (
+          <small className="text-muted" style={{ marginLeft: '8px' }}>
+            was {Math.round(historyData.average)}ms
+          </small>
+        )}
+        {' '}
         <button 
           type="button"
           className="btn btn-sm btn-outline-primary"
           onClick={handleRetry}
           title={`Retry ${item.name}`}
+          style={{ marginLeft: '8px' }}
         >
           Retry
         </button>
+      </td>
+      <td style={{ padding: 0 }} className="no-mobile">
+        {historyData && historyData.values && historyData.values.length > 0 && (
+          <Sparklines
+            data={historyData.values}
+            width={200}
+            height={48}
+            limit={100}
+            margin={2}
+          >
+            <SparklinesLine
+              color={sparklineColor}
+              style={{ strokeWidth: 2, opacity: 0.5 }}
+            />
+          </Sparklines>
+        )}
       </td>
     </tr>
   )
@@ -416,6 +439,10 @@ const renderError = (item) => {
  * @returns {React.Element} Complete results table
  */
 const Table = ({ history = [], blockList = [], stats = {} }) => {
+  // Build lookup of history data by domain for blocked items
+  const historyByDomain = {}
+  history.forEach(h => { historyByDomain[h.domain] = h })
+
   // Sort history by average latency for better UX
   const sortedHistory = [...history].sort((a, b) => (a.average || Infinity) - (b.average || Infinity))
   
@@ -444,7 +471,7 @@ const Table = ({ history = [], blockList = [], stats = {} }) => {
         </thead>
         <tbody>
           {sortedHistory.map(renderRow)}
-          {blockList.map(renderError)}
+          {blockList.map(item => renderError(item, historyByDomain[item.domain]))}
         </tbody>
       </table>
       
